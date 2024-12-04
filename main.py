@@ -20,21 +20,33 @@ pygame.init()
 WIDTH, HEIGHT = 1050, 650
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Menu avec Play et Gasha")
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-
+# Color palette
+COLORS = {
+    'background': (245, 245, 245),    # Light gray background
+    'primary': (70, 130, 180),        # Steel blue for main elements
+    'secondary': (255, 255, 255),     # White for contrast
+    'text': (50, 50, 50),            # Dark gray for text
+    'button': {
+        'normal': (200, 200, 200),    # Light gray for buttons
+        'hover': (180, 180, 180),     # Slightly darker for hover
+        'border': (100, 100, 100)     # Dark gray for borders
+    },
+    'rarity': {
+        1: (192, 192, 192),    # Silver for common
+        2: (50, 205, 50),      # Lime green for uncommon
+        3: (65, 105, 225),     # Royal blue for rare
+        4: (148, 0, 211),      # Purple for epic
+        5: (255, 215, 0)       # Gold for legendary
+    }
+}
 # Load background image
 background_img = pygame.image.load("assets/images/background/ton_image_de_fond.png")
 background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
 
 # Create fonts
 font = pygame.font.Font(None, 50)
-
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
 # Button texts
 play_text = font.render('Play', True, BLACK)
 gasha_text = font.render('Gasha', True, BLACK)
