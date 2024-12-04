@@ -81,22 +81,120 @@ def tirage(crate):
     
     return sorti_etoile
 
+def display_gacha(screen):
+    # Background with gradient
+    screen.fill((245, 245, 245))
+    
+    # Title
+    title_font = pygame.font.Font(None, 60)
+    title = title_font.render("Gacha Shop", True, (50, 50, 50))
+    screen.blit(title, (WIDTH//2 - title.get_width()//2, 50))
+    
+    # Crate buttons with better styling
+    simple_crate = pygame.Rect(WIDTH//4 - 100, HEIGHT//2 - 100, 200, 200)
+    epic_crate = pygame.Rect(3*WIDTH//4 - 100, HEIGHT//2 - 100, 200, 200)
+    
+    # Draw crates with shadows
+    pygame.draw.rect(screen, (180, 180, 180), simple_crate.move(5, 5), border_radius=20)
+    pygame.draw.rect(screen, (220, 100, 100), simple_crate, border_radius=20)
+    pygame.draw.rect(screen, (180, 180, 180), epic_crate.move(5, 5), border_radius=20)
+    pygame.draw.rect(screen, (100, 150, 220), epic_crate, border_radius=20)
+    
+    # Crate labels
+    crate_font = pygame.font.Font(None, 40)
+    simple_text = crate_font.render("Simple Crate", True, (255, 255, 255))
+    epic_text = crate_font.render("Epic Crate", True, (255, 255, 255))
+    
+    screen.blit(simple_text, (simple_crate.centerx - simple_text.get_width()//2, 
+                             simple_crate.centery - simple_text.get_height()//2))
+    screen.blit(epic_text, (epic_crate.centerx - epic_text.get_width()//2, 
+                           epic_crate.centery - epic_text.get_height()//2))
+    
+    # Return button
+    button_retour_rect = pygame.Rect(50, 550, 120, 50)
+    pygame.draw.rect(screen, (200, 200, 200), button_retour_rect, border_radius=15)
+    pygame.draw.rect(screen, (100, 100, 100), button_retour_rect, 2, border_radius=15)
+    retour_text = font.render("Return", True, (50, 50, 50))
+    screen.blit(retour_text, (button_retour_rect.centerx - retour_text.get_width()//2,
+                             button_retour_rect.centery - retour_text.get_height()//2))
+    
+    return simple_crate, epic_crate, button_retour_rect
+
+def display_reward(screen, item, rarity):
+    # Animated reward display
+    overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 128))
+    screen.blit(overlay, (0, 0))
+    
+    # Rarity colors
+    rarity_colors = {
+        1: (200, 200, 200),  # Common
+        2: (100, 200, 100),  # Uncommon
+        3: (100, 100, 200),  # Rare
+        4: (200, 100, 200),  # Epic
+        5: (255, 215, 0)     # Legendary
+    }
+    
+    # Reward box
+    reward_rect = pygame.Rect(WIDTH//2 - 150, HEIGHT//2 - 100, 300, 200)
+    pygame.draw.rect(screen, rarity_colors[rarity], reward_rect, border_radius=20)
+    pygame.draw.rect(screen, (255, 255, 255), reward_rect, 4, border_radius=20)
+    
+    # Item text
+    reward_font = pygame.font.Font(None, 50)
+    item_text = reward_font.render(item, True, (255, 255, 255))
+    screen.blit(item_text, (reward_rect.centerx - item_text.get_width()//2,
+                           reward_rect.centery - item_text.get_height()//2))
+
+
 def choix_item(sortie_etoile,liste_item,inv):
     item = liste_item[sortie_etoile] [randint(0,len(liste_item[sortie_etoile])-1)]
     if item in inv:
         print(f"tu as eu {item} ")
         inv[item] += 1
-        font = pygame.font.Font(None, 36)
-        item_text = font.render(item, True, BLACK)
-        item_x = screen.get_width() // 2 - item_text.get_width() // 2
-        item_y = screen.get_height() // 2 - item_text.get_height() // 2
-        screen.blit(item_text, (item_x, item_y))
         pygame.display.flip()
-        pygame.time.delay(2000)  # 2 seconds
-        screen.fill(WHITE, (item_x, item_y, item_text.get_width(), item_text.get_height()))
         pygame.display.flip()
         return item
     
+# Add this constant at the start
+RETURN_BUTTON_RECT_INV = pygame.Rect(20, 20, 120, 50)
+
+def display_inventory(screen, inv):
+    # Background
+    screen.fill((245, 245, 245))  # Light gray background
+    
+    # Return button in top left
+    pygame.draw.rect(screen, (200, 200, 200), RETURN_BUTTON_RECT_INV, border_radius=15)
+    pygame.draw.rect(screen, (100, 100, 100), RETURN_BUTTON_RECT_INV, 2, border_radius=15)
+    retour_text = font.render("Return", True, (50, 50, 50))
+    screen.blit(retour_text, (RETURN_BUTTON_RECT_INV.centerx - retour_text.get_width()//2,
+                             RETURN_BUTTON_RECT_INV.centery - retour_text.get_height()//2))
+    
+    # Title
+    title_font = pygame.font.Font(None, 60)
+    title = title_font.render("Inventaire", True, (50, 50, 50))
+    screen.blit(title, (WIDTH//2 - title.get_width()//2, 50))
+    
+    # Item display
+    item_font = pygame.font.Font(None, 40)
+    start_x = 100
+    start_y = 150
+    spacing_y = 50
+    
+    for i, (item, quantity) in enumerate(inv.items()):
+        if quantity > 0:
+            # Item background
+            item_rect = pygame.Rect(start_x, start_y + i*spacing_y, 400, 40)
+            pygame.draw.rect(screen, (255, 255, 255), item_rect, border_radius=10)
+            pygame.draw.rect(screen, (100, 100, 100), item_rect, 2, border_radius=10)
+            
+            # Item name
+            item_text = item_font.render(f"{item}: {quantity}", True, (50, 50, 50))
+            screen.blit(item_text, (start_x + 20, start_y + i*spacing_y + 5))
+
+    return RETURN_BUTTON_RECT_INV
+
+
 
 #classes : 
 
@@ -348,31 +446,31 @@ while running:
         draw_button(inventory_button_rect, inv_text) 
 
     if in_inv:
-      screen.fill(WHITE)
-      pygame.draw.rect(screen, GRAY, button_retour_rect)
-      text3 = font.render("Retour", True, BLACK)
-      screen.blit(text3, (button_retour_rect.x + 10, button_retour_rect.y + 10))
-      liste_object = [obje for obje,val in inv.items() if val >= 1]
-      text_liste = ""
-      for i in liste_object:
-        text_liste += f"{i} ,"
-      text_inv = font.render(text_liste, True, BLACK)
-      screen.blit(text_inv,(button_caisse_rect.x + 10, button_caisse_rect.y + 10))
+      button_retour_rect = display_inventory(screen, inv)
+      if event.type == pygame.MOUSEBUTTONDOWN:
+          if RETURN_BUTTON_RECT_INV.collidepoint(event.pos):
+              in_inv = False
+              inmenu = True
+
       
     elif ingasha:
-        screen.fill(WHITE)
-        pygame.draw.rect(screen, RED, button_caisse_rect)
-        pygame.draw.rect(screen, GREEN, button_epique_rect)
-        pygame.draw.rect(screen, GRAY, button_retour_rect)
-        font = pygame.font.Font(None, 36)
-        text1 = font.render("simple", True, BLACK)
-        text2 = font.render("double", True, BLACK)
-        text3 = font.render("Retour", True, BLACK)
-        screen.blit(text1, (button_caisse_rect.x + 10, button_caisse_rect.y + 10))
-        screen.blit(text2, (button_epique_rect.x + 10, button_epique_rect.y + 10))
-        screen.blit(text3, (button_retour_rect.x + 10, button_retour_rect.y + 10))
-        pygame.display.flip()
-
+        simple_crate, epic_crate, button_retour_rect = display_gacha(screen)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if simple_crate.collidepoint(event.pos):
+                crate = 1
+                item = choix_item(tirage(crate), liste_item, inv)
+                display_reward(screen, item, tirage(crate))
+                pygame.display.flip()
+                pygame.time.delay(2000)
+            elif epic_crate.collidepoint(event.pos):
+                crate = 2
+                item = choix_item(tirage(crate), liste_item, inv)
+                display_reward(screen, item, tirage(crate))
+                pygame.display.flip()
+                pygame.time.delay(2000)
+            elif button_retour_rect.collidepoint(event.pos):
+                ingasha = False
+                inmenu = True
     elif in_play:
        if game_over == False:
         #regarde si le joueur a perdu
@@ -488,3 +586,13 @@ while running:
     pygame.display.update()
 
 pygame.quit()
+
+# Add this at the start with other constants
+RETURN_BUTTON_RECT = pygame.Rect(WIDTH - 150, 20, 120, 50)
+
+def draw_return_button(screen):
+    pygame.draw.rect(screen, (200, 200, 200), RETURN_BUTTON_RECT, border_radius=15)
+    pygame.draw.rect(screen, (100, 100, 100), RETURN_BUTTON_RECT, 2, border_radius=15)
+    retour_text = font.render("Return", True, (50, 50, 50))
+    screen.blit(retour_text, (RETURN_BUTTON_RECT.centerx - retour_text.get_width()//2,
+                             RETURN_BUTTON_RECT.centery - retour_text.get_height()//2))
