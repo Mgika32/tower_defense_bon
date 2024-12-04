@@ -17,7 +17,7 @@ button_epique_rect = pygame.Rect(250, 100, 100, 50)
 
 pygame.init()
 
-WIDTH, HEIGHT = 1100, 700
+WIDTH, HEIGHT = 1050, 650
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Menu avec Play et Gasha")
 
