@@ -8,6 +8,8 @@ from enemy_data import ENEMY_DATA
 from world import World
 import json
 from turret import Turret
+from turret_data import TURRET_DATA
+from enemy import Enemy
 
 # Variable initialization
 inv = {"a": 0, "b": 0, "artillerie": 0, "c": 0, "lance grenade": 0, "d": 0, "sorcier": 0, "cannonier": 0, "lance_pierre": 0, "archer": 0, "caserne": 0, "ralentisseur" : 0}
@@ -90,7 +92,7 @@ def tirage(crate):
             sorti_etoile = 4 
         else: 
             sorti_etoile = 5
-    
+    print(f"sorti_etoile = {sorti_etoile}")
     return sorti_etoile
 
 def display_gacha(screen):
@@ -238,61 +240,7 @@ class Button():
     surface.blit(self.image, self.rect)
 
     return action
-  
-class Enemy(pygame.sprite.Sprite):
-  def __init__(self, enemy_type, waypoints, images):
-    pygame.sprite.Sprite.__init__(self)
-    self.waypoints = waypoints
-    self.pos = Vector2(self.waypoints[0])
-    self.target_waypoint = 1
-    self.health = ENEMY_DATA.get(enemy_type)["health"]
-    self.speed = ENEMY_DATA.get(enemy_type)["speed"]
-    self.angle = 0
-    self.original_image = images.get(enemy_type)
-    self.image = pygame.transform.rotate(self.original_image, self.angle)
-    self.rect = self.image.get_rect()
-    self.rect.center = self.pos
 
-  def update(self, world):
-    self.move(world)
-    self.rotate()
-    self.check_alive(world)
-
-  def move(self, world):
-    #define a target waypoint
-    if self.target_waypoint < len(self.waypoints):
-      self.target = Vector2(self.waypoints[self.target_waypoint])
-      self.movement = self.target - self.pos
-    else:
-      #enemy has reached the end of the path
-      self.kill()
-      world.health -= 1
-      world.missed_enemies += 1
-
-    #calculate distance to target
-    dist = self.movement.length()
-    if dist >= (self.speed * world.game_speed):
-      self.pos += self.movement.normalize() * (self.speed * world.game_speed)
-    else:
-      if dist != 0:
-        self.pos += self.movement.normalize() * dist
-      self.target_waypoint += 1
-
-  def rotate(self):
-    #calculate distance to next waypoint
-    dist = self.target - self.pos
-    #use distance to calculate angle
-    self.angle = math.degrees(math.atan2(-dist[1], dist[0]))
-    #rotate l'image et met a jour le rectangle
-    self.image = pygame.transform.rotate(self.original_image, self.angle)
-    self.rect = self.image.get_rect()
-    self.rect.center = self.pos
-
-  def check_alive(self, world):
-    if self.health <= 0:
-      world.killed_enemies += 1
-      world.money += c.KILL_REWARD
-      self.kill()
 #game variables
 game_over = False
 game_outcome = 0 # -1 is loss & 1 is win
@@ -430,20 +378,7 @@ while running:
                 if inventory_button_rect.collidepoint(event.pos):
                    print("Inv button pressed!")
                    in_inv = True
-            if ingasha:
-              if event.type == pygame.MOUSEBUTTONDOWN:
-                if button_caisse_rect.collidepoint(event.pos):
-                    crate = 1
-                    print(choix_item(tirage(crate), liste_item, inv))
-                    print(inv)
-                elif button_epique_rect.collidepoint(event.pos):
-                    crate = 2
-                    print(choix_item(tirage(crate), liste_item, inv))
-                    print(inv)
-                elif button_retour_rect.collidepoint(event.pos):
-                    print("Retour Button Pressed!")
-                    ingasha = False
-                    inmenu = True
+
             if in_inv:
               if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_retour_rect.collidepoint(event.pos):
@@ -470,14 +405,16 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if simple_crate.collidepoint(event.pos):
                 crate = 1
-                item = choix_item(tirage(crate), liste_item, inv)
-                display_reward(screen, item, tirage(crate))
+                etoile = tirage(crate)
+                item = choix_item(etoile, liste_item, inv)
+                display_reward(screen, item, etoile)
                 pygame.display.flip()
                 pygame.time.delay(2000)
             elif epic_crate.collidepoint(event.pos):
                 crate = 2
-                item = choix_item(tirage(crate), liste_item, inv)
-                display_reward(screen, item, tirage(crate))
+                etoile = tirage(crate)
+                item = choix_item(etoile, liste_item, inv)
+                display_reward(screen, item, etoile)
                 pygame.display.flip()
                 pygame.time.delay(2000)
             elif button_retour_rect.collidepoint(event.pos):

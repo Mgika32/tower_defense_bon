@@ -1,12 +1,13 @@
-import pygame as pg
+import pygame
 from pygame.math import Vector2
-import math
-import constants as c
 from enemy_data import ENEMY_DATA
+import constants as c
+import math
 
-class Enemy(pg.sprite.Sprite):
+
+class Enemy(pygame.sprite.Sprite):
   def __init__(self, enemy_type, waypoints, images):
-    pg.sprite.Sprite.__init__(self)
+    pygame.sprite.Sprite.__init__(self)
     self.waypoints = waypoints
     self.pos = Vector2(self.waypoints[0])
     self.target_waypoint = 1
@@ -14,7 +15,7 @@ class Enemy(pg.sprite.Sprite):
     self.speed = ENEMY_DATA.get(enemy_type)["speed"]
     self.angle = 0
     self.original_image = images.get(enemy_type)
-    self.image = pg.transform.rotate(self.original_image, self.angle)
+    self.image = pygame.transform.rotate(self.original_image, self.angle)
     self.rect = self.image.get_rect()
     self.rect.center = self.pos
 
@@ -36,7 +37,6 @@ class Enemy(pg.sprite.Sprite):
 
     #calculate distance to target
     dist = self.movement.length()
-    #check if remaining distance is greater than the enemy speed
     if dist >= (self.speed * world.game_speed):
       self.pos += self.movement.normalize() * (self.speed * world.game_speed)
     else:
@@ -49,8 +49,8 @@ class Enemy(pg.sprite.Sprite):
     dist = self.target - self.pos
     #use distance to calculate angle
     self.angle = math.degrees(math.atan2(-dist[1], dist[0]))
-    #rotate image and update rectangle
-    self.image = pg.transform.rotate(self.original_image, self.angle)
+    #rotate l'image et met a jour le rectangle
+    self.image = pygame.transform.rotate(self.original_image, self.angle)
     self.rect = self.image.get_rect()
     self.rect.center = self.pos
 
