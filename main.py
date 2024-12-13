@@ -10,6 +10,7 @@ import json
 from turret import Turret
 from turret_data import TURRET_DATA
 from enemy import Enemy
+from image import *
 
 # Variable initialization
 inv = {"a": 0, "b": 0, "artillerie": 0, "c": 0, "lance grenade": 0, "d": 0, "sorcier": 0, "cannonier": 0, "lance_pierre": 0, "archer": 0, "caserne": 0, "ralentisseur" : 0}
@@ -45,12 +46,47 @@ COLORS = {
 background_img = pygame.image.load("assets/images/background/ton_image_de_fond.png")
 background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
 
+#load images
+map_image = pygame.image.load('levels/level.png').convert_alpha()
+#turret spritesheets
+turret_spritesheets = []
+for x in range(1, c.TURRET_LEVELS + 1):
+  turret_sheet = pygame.image.load(f'assets/images/turrets/turret_{x}.png').convert_alpha()
+  turret_spritesheets.append(turret_sheet)
+#individual turret image for mouse cursor
+cursor_turret = pygame.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
+#enemies
+enemy_images = {
+  "weak": pygame.image.load('assets/images/enemies/enemy_1.png').convert_alpha(),
+  "medium": pygame.image.load('assets/images/enemies/enemy_2.png').convert_alpha(),
+  "strong": pygame.image.load('assets/images/enemies/enemy_3.png').convert_alpha(),
+  "elite": pygame.image.load('assets/images/enemies/enemy_4.png').convert_alpha()
+}
+#buttons
+buy_turret_image = pygame.image.load('assets/images/buttons/buy_turret.png').convert_alpha()
+cancel_image = pygame.image.load('assets/images/buttons/cancel.png').convert_alpha()
+upgrade_turret_image = pygame.image.load('assets/images/buttons/upgrade_turret.png').convert_alpha()
+begin_image = pygame.image.load('assets/images/buttons/begin.png').convert_alpha()
+restart_image = pygame.image.load('assets/images/buttons/restart.png').convert_alpha()
+fast_forward_image = pygame.image.load('assets/images/buttons/fast_forward.png').convert_alpha()
+settings_button_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 125, 200, 50)
+
+#gui
+heart_image = pygame.image.load("assets/images/gui/heart.png").convert_alpha()
+coin_image = pygame.image.load("assets/images/gui/coin.png").convert_alpha()
+logo_image = pygame.image.load("assets/images/gui/logo.png").convert_alpha()
+
+#load sounds
+shot_fx = pygame.mixer.Sound('assets/audio/shot.wav')
+shot_fx.set_volume(0.5)
+
 # Create fonts
 font = pygame.font.Font(None, 50)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 # Button texts
 play_text = font.render('Play', True, BLACK)
+settings_text = font.render('Paramètres', True, BLACK)
 gasha_text = font.render('Gasha', True, BLACK)
 retour_text = font.render('Retour', True, BLACK)
 inv_text = font.render('Inventaire', True, BLACK)
@@ -208,8 +244,21 @@ def display_inventory(screen, inv):
 
     return RETURN_BUTTON_RECT_INV
 
+RETURN_BUTTON_RECT_SETTINGS = pygame.Rect(20, 20, 120, 50)
 
-
+def display_settings(screen):
+    screen.fill((245, 245, 245))
+    title_font = pygame.font.Font(None, 60)
+    title = title_font.render("Paramètres", True, (50, 50, 50))
+    screen.blit(title, (WIDTH//2 - title.get_width()//2, 50))
+    
+    # Add return button
+    return_button = pygame.Rect(50, 550, 120, 50)
+    pygame.draw.rect(screen, (200, 200, 200), return_button, border_radius=15)
+    return_text = font.render("Retour", True, (50, 50, 50))
+    screen.blit(return_text, (return_button.centerx - return_text.get_width()//2,
+                             return_button.centery - return_text.get_height()//2))
+    return return_button
 #classes : 
 
 class Button():
@@ -248,38 +297,7 @@ level_started = False
 last_enemy_spawn = pygame.time.get_ticks()
 placing_turrets = False
 selected_turret = None
-
-#load images
-map_image = pygame.image.load('levels/level.png').convert_alpha()
-#turret spritesheets
-turret_spritesheets = []
-for x in range(1, c.TURRET_LEVELS + 1):
-  turret_sheet = pygame.image.load(f'assets/images/turrets/turret_{x}.png').convert_alpha()
-  turret_spritesheets.append(turret_sheet)
-#individual turret image for mouse cursor
-cursor_turret = pygame.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
-#enemies
-enemy_images = {
-  "weak": pygame.image.load('assets/images/enemies/enemy_1.png').convert_alpha(),
-  "medium": pygame.image.load('assets/images/enemies/enemy_2.png').convert_alpha(),
-  "strong": pygame.image.load('assets/images/enemies/enemy_3.png').convert_alpha(),
-  "elite": pygame.image.load('assets/images/enemies/enemy_4.png').convert_alpha()
-}
-#buttons
-buy_turret_image = pygame.image.load('assets/images/buttons/buy_turret.png').convert_alpha()
-cancel_image = pygame.image.load('assets/images/buttons/cancel.png').convert_alpha()
-upgrade_turret_image = pygame.image.load('assets/images/buttons/upgrade_turret.png').convert_alpha()
-begin_image = pygame.image.load('assets/images/buttons/begin.png').convert_alpha()
-restart_image = pygame.image.load('assets/images/buttons/restart.png').convert_alpha()
-fast_forward_image = pygame.image.load('assets/images/buttons/fast_forward.png').convert_alpha()
-#gui
-heart_image = pygame.image.load("assets/images/gui/heart.png").convert_alpha()
-coin_image = pygame.image.load("assets/images/gui/coin.png").convert_alpha()
-logo_image = pygame.image.load("assets/images/gui/logo.png").convert_alpha()
-
-#load sounds
-shot_fx = pygame.mixer.Sound('assets/audio/shot.wav')
-shot_fx.set_volume(0.5)
+in_settings = False
 
 #load json data
 with open('levels/level.tmj') as file:
@@ -378,7 +396,31 @@ while running:
                 if inventory_button_rect.collidepoint(event.pos):
                    print("Inv button pressed!")
                    in_inv = True
+                if settings_button_rect.collidepoint(event.pos):
+                   print("Settings Button Pressed!")
+                   inmenu = False
+                   in_settings = True
 
+            if ingasha:
+              if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_caisse_rect.collidepoint(event.pos):
+                    crate = 1
+                    print(choix_item(tirage(crate), liste_item, inv))
+                    print(inv)
+                elif button_epique_rect.collidepoint(event.pos):
+                    crate = 2
+                    print(choix_item(tirage(crate), liste_item, inv))
+                    print(inv)
+                elif button_retour_rect.collidepoint(event.pos):
+                    print("Retour Button Pressed!")
+                    ingasha = False
+                    inmenu = True
+            if in_settings:
+              if event.type == pygame.MOUSEBUTTONDOWN:
+                if button_retour_rect.collidepoint(event.pos):
+                  print("Retour Button Pressed!")
+                  in_settings = False
+                  inmenu = True
             if in_inv:
               if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_retour_rect.collidepoint(event.pos):
@@ -390,13 +432,21 @@ while running:
         screen.blit(background_img, (0, 0))
         draw_button(play_button_rect, play_text)
         draw_button(gasha_button_rect, gasha_text)
-        draw_button(inventory_button_rect, inv_text) 
+        draw_button(inventory_button_rect, inv_text)
+        draw_button(settings_button_rect, settings_text)
 
     if in_inv:
       button_retour_rect = display_inventory(screen, inv)
       if event.type == pygame.MOUSEBUTTONDOWN:
           if RETURN_BUTTON_RECT_INV.collidepoint(event.pos):
               in_inv = False
+              inmenu = True
+
+    if in_settings:
+      button_retour_rect = display_settings(screen)
+      if event.type == pygame.MOUSEBUTTONDOWN:
+          if RETURN_BUTTON_RECT_SETTINGS.collidepoint(event.pos):
+              in_settings = False
               inmenu = True
 
       
