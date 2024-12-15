@@ -55,6 +55,7 @@ for x in range(1, c.TURRET_LEVELS + 1):
   turret_spritesheets.append(turret_sheet)
 #individual turret image for mouse cursor
 cursor_turret = pygame.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
+
 #enemies
 enemy_images = {
   "weak": pygame.image.load('assets/images/enemies/enemy_1.png').convert_alpha(),
