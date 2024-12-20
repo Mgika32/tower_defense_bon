@@ -70,7 +70,8 @@ upgrade_turret_image = pygame.image.load('assets/images/buttons/upgrade_turret.p
 begin_image = pygame.image.load('assets/images/buttons/begin.png').convert_alpha()
 restart_image = pygame.image.load('assets/images/buttons/restart.png').convert_alpha()
 fast_forward_image = pygame.image.load('assets/images/buttons/fast_forward.png').convert_alpha()
-settings_button_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 125, 200, 50)
+settings_icon = pygame.image.load('assets/images/gui/gear_icon.png').convert_alpha()
+settings_icon = pygame.transform.scale(settings_icon, (50, 50))
 
 #gui
 heart_image = pygame.image.load("assets/images/gui/heart.png").convert_alpha()
@@ -87,7 +88,6 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 # Button texts
 play_text = font.render('Play', True, BLACK)
-settings_text = font.render('Paramètres', True, BLACK)
 gasha_text = font.render('Gasha', True, BLACK)
 retour_text = font.render('Retour', True, BLACK)
 inv_text = font.render('Inventaire', True, BLACK)
@@ -98,6 +98,7 @@ play_button_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 - 100, 200, 50)
 inventory_button_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 200, 200, 50)
 gasha_button_rect = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 50, 200, 50)
 button_retour_rect = pygame.Rect(50, 550, 100, 50)
+settings_button_rect = pygame.Rect(50, HEIGHT - 100, 50, 50)
 
 def draw_button(rect, text):
     pygame.draw.rect(screen, GRAY, rect)
@@ -253,12 +254,12 @@ def display_settings(screen):
     title = title_font.render("Paramètres", True, (50, 50, 50))
     screen.blit(title, (WIDTH//2 - title.get_width()//2, 50))
     
-    # Add return button
+    # Bouton retour
     return_button = pygame.Rect(50, 550, 120, 50)
     pygame.draw.rect(screen, (200, 200, 200), return_button, border_radius=15)
     return_text = font.render("Retour", True, (50, 50, 50))
     screen.blit(return_text, (return_button.centerx - return_text.get_width()//2,
-                             return_button.centery - return_text.get_height()//2))
+                              return_button.centery - return_text.get_height()//2))
     return return_button
 #classes : 
 
@@ -401,6 +402,7 @@ while running:
                    print("Settings Button Pressed!")
                    inmenu = False
                    in_settings = True
+                
 
             if ingasha:
               if event.type == pygame.MOUSEBUTTONDOWN:
@@ -434,7 +436,7 @@ while running:
         draw_button(play_button_rect, play_text)
         draw_button(gasha_button_rect, gasha_text)
         draw_button(inventory_button_rect, inv_text)
-        draw_button(settings_button_rect, settings_text)
+        screen.blit(settings_icon, settings_button_rect)
 
     if in_inv:
       button_retour_rect = display_inventory(screen, inv)
