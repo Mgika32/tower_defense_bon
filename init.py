@@ -10,3 +10,5 @@ class archer():
         self.cible = ["air", "sol"]
         self.att.type = "physique"
         self.image = 0 #a remplacer avec le png 
+
+#test
