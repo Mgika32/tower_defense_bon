@@ -12,3 +12,4 @@ class archer():
         self.image = 0 #a remplacer avec le png 
 
 #test
+#test 2
