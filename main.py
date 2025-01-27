@@ -18,6 +18,7 @@ liste_item = {5: ["a", "b"], 4: ["artillerie", "c"], 3: ['lance grenade', "d"], 
 button_caisse_rect = pygame.Rect(50, 100, 100, 50)
 button_epique_rect = pygame.Rect(250, 100, 100, 50)
 
+
 pygame.init()
 
 WIDTH, HEIGHT = 1050, 650
@@ -50,10 +51,10 @@ background_img = pygame.transform.scale(background_img, (WIDTH, HEIGHT))
 map_image = pygame.image.load('levels/level.png').convert_alpha()
 #turret spritesheets
 turret_spritesheets = []
-for x in range(1, c.TURRET_LEVELS + 1):
+for x in range(1, c.TURRET_LEVELS + 1) :
   turret_sheet = pygame.image.load(f'assets/images/turrets/turret_{x}.png').convert_alpha()
   turret_spritesheets.append(turret_sheet)
-#individual turret image for mouse cursor
+  #individual turret image for mouse cursor
 cursor_turret = pygame.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 
 #enemies
